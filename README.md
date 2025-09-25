@@ -293,47 +293,6 @@ print(f"Explanation: {result.explanation}")
 
 ---
 
-## 📊 Live Demo
-
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-demo-app.streamlit.app)
-
-Try our interactive demo to see the system in action!
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Setup
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run tests
-pytest tests/
-
-# Format code
-black src/
-flake8 src/
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 📞 Contact
-
-- **Project Lead**: Kushal Adhyaru (018202106)
-- **Email**: team@structured-data-analysis.com
-- **GitHub**: [@your-username](https://github.com/your-username)
-
----
-
 <div align="center">
 
 **⭐ Star this repository if you find it helpful!**
