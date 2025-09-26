@@ -3,7 +3,6 @@
 <div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)
 
 **Bridging the gap between natural language and structured data through advanced LLM techniques**
