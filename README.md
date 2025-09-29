@@ -299,3 +299,38 @@ print(f"Explanation: {result.explanation}")
 Made with ❤️ by the Structured Data Analysis Team
 
 </div>
+
+---
+
+## Quick dev start (local testing)
+
+If you want a minimal workflow to validate the Python code without loading large models or a database, follow these steps:
+
+1. Create and activate a virtualenv:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Run tests (a small unit test exists for SchemaManager):
+
+```bash
+pytest -q
+```
+
+4. Start the API (uses DummyModel by default):
+
+```bash
+uvicorn src.api.main:app --reload
+```
+
+Notes:
+- The default NL2SQL generator uses `DummyModel` for quick local testing. Replace it with your model wrapper when ready.
+- For schema reflection, set `DATABASE_URL` in the environment to point to a Postgres instance.
