@@ -92,12 +92,7 @@ class SchemaManager:
         - schema_graph_brief: string with FK relations
         """
         if not self.schema_cache:
-            # Provide a minimal empty-safe context rather than raising, so API can work offline
-            return {
-                "schema": {"tables": {}},
-                "top_k_schema_items": [],
-                "schema_graph_brief": "",
-            }
+            raise ValueError("Schema not initialized. Call refresh_schema first.")
 
         return {
             "schema": self.schema_cache,
