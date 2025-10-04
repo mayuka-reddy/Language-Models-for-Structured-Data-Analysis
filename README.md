@@ -1,4 +1,4 @@
-# 🚀 NL-to-SQL Assistant
+# 🚀 NLP-to-SQL Assistant
 
 Convert natural language questions into SQL queries with instant execution, insights, and visualizations.
 
