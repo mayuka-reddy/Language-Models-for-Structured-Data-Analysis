@@ -1,4 +1,4 @@
-"""Main FastAPI application for the NL to SQL service."""
+"""Main FastAPI application for the NLP to SQL service."""
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
@@ -9,7 +9,7 @@ from src.database.connection import DatabaseConnection
 from src.schema.manager import SchemaManager
 
 app = FastAPI(
-    title="NL to SQL API",
+    title="NLP to SQL API",
     description="Convert natural language questions to SQL queries",
     version="0.1.0"
 )
@@ -129,6 +129,25 @@ async def decompose_question(request: DecomposeRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring."""
+    return {
+        "status": "healthy",
+        "service": "nl2sql-api",
+        "version": "0.1.0"
+    }
+
+@app.get("/")
+async def root():
+    """Root endpoint with API information."""
+    return {
+        "message": "NL-to-SQL Assistant API",
+        "version": "0.1.0",
+        "docs": "/docs",
+        "health": "/health"
+    }
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

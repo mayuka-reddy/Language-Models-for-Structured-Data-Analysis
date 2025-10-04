@@ -1,4 +1,4 @@
-"""NL to SQL generation model and prompt management."""
+"""NLP to SQL generation model and prompt management."""
 # -*- coding: utf-8 -*-
 from typing import Dict, Any, List, Optional
 import json

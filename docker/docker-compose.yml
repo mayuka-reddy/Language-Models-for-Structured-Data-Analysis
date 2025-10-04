@@ -1,0 +1,127 @@
+# Docker Compose for NL-to-SQL Assistant
+# Orchestrates all services for development and production
+
+version: '3.8'
+
+services:
+  # Database service
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: nl2sql_db
+      POSTGRES_USER: nl2sql_user
+      POSTGRES_PASSWORD: nl2sql_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nl2sql_user -d nl2sql_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API service
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.app
+    environment:
+      - DATABASE_URL=postgresql://nl2sql_user:nl2sql_pass@database:5432/nl2sql_db
+      - DUCKDB_PATH=/app/data/processed/olist.duckdb
+      - MODEL_CACHE_DIR=/app/models/cache
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    volumes:
+      - ../data:/app/data
+      - ../models:/app/models
+      - ../rag/indices:/app/rag/indices
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # UI service
+  ui:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ui
+    environment:
+      - API_BASE_URL=http://api:8000
+      - UI_HOST=0.0.0.0
+      - UI_PORT=7860
+    ports:
+      - "7860:7860"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # MLflow tracking server
+  mlflow:
+    image: python:3.9-slim
+    command: >
+      bash -c "
+        pip install mlflow psycopg2-binary &&
+        mlflow server 
+          --backend-store-uri postgresql://nl2sql_user:nl2sql_pass@database:5432/nl2sql_db
+          --default-artifact-root /mlflow/artifacts
+          --host 0.0.0.0
+          --port 5000
+      "
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+    ports:
+      - "5000:5000"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # Training service (for fine-tuning)
+  training:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.training
+    environment:
+      - WANDB_API_KEY=${WANDB_API_KEY}
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - TRAINING_OUTPUT_DIR=/app/training/checkpoints
+    volumes:
+      - ../data:/app/data
+      - ../training:/app/training
+      - ../models:/app/models
+      - training_cache:/root/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - training  # Only start with --profile training
+
+volumes:
+  postgres_data:
+  mlflow_artifacts:
+  redis_data:
+  training_cache:
+
+networks:
+  default:
+    name: nl2sql_network

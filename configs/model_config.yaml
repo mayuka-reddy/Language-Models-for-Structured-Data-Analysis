@@ -1,0 +1,45 @@
+# Model Configuration for NL-to-SQL Assistant
+
+model:
+  # Primary model settings
+  name: "t5-small"  # HuggingFace model name
+  cache_dir: "./models/cache"
+  
+  # Generation parameters
+  max_input_length: 512
+  max_output_length: 256
+  num_beams: 4
+  temperature: 0.7
+  do_sample: true
+  early_stopping: true
+  
+  # Alternative models (for comparison)
+  alternatives:
+    - name: "t5-base"
+      max_input_length: 512
+      max_output_length: 256
+    - name: "google/flan-t5-small"
+      max_input_length: 512
+      max_output_length: 256
+
+# Intent classification model (optional)
+intent_classifier:
+  name: "distilbert-base-uncased"
+  enabled: false
+  classes:
+    - "select_query"
+    - "aggregation_query"
+    - "join_query"
+    - "filter_query"
+
+# Model performance settings
+performance:
+  batch_size: 8
+  max_concurrent_requests: 10
+  timeout_seconds: 30
+  
+# Caching settings
+cache:
+  enabled: true
+  max_size: 1000
+  ttl_seconds: 3600

@@ -1,0 +1,40 @@
+# Chain-of-Thought Prompting Template
+# Owner: Kushal Adhyaru
+
+system_prompt: |
+  You are an expert SQL analyst with deep knowledge of relational databases.
+  Think through each problem step by step, showing your reasoning process.
+
+reasoning_steps:
+  - "Step 1: Analyze the natural language question to understand what information is being requested"
+  - "Step 2: Identify which tables and columns from the schema are needed to answer the question"
+  - "Step 3: Determine the appropriate SQL operations (SELECT, JOIN, WHERE, GROUP BY, etc.)"
+  - "Step 4: Plan the query structure, including any necessary joins between tables"
+  - "Step 5: Write the complete SQL query with proper syntax"
+  - "Step 6: Verify the query logic matches the original question"
+
+output_format: |
+  Provide your step-by-step reasoning, then output a JSON object with:
+  {
+    "sql": "your SQL query here",
+    "used_tables": ["list", "of", "tables"],
+    "used_columns": ["list", "of", "columns"],
+    "reason_short": "brief explanation of approach",
+    "confidence": 0.95
+  }
+
+examples:
+  - question: "What are the top 3 cities by total order value?"
+    reasoning: |
+      Step 1: Need to find cities with highest total order values
+      Step 2: Need orders table (for order values) and customer table (for city)
+      Step 3: Need JOIN, GROUP BY city, SUM order values, ORDER BY DESC, LIMIT 3
+      Step 4: JOIN orders ON customer_id, GROUP BY city, aggregate sum
+      Step 5: Write complete query with proper joins and aggregation
+    sql: |
+      SELECT c.city, SUM(o.total_amount) as total_value
+      FROM customer c
+      JOIN orders o ON c.customer_id = o.customer_id  
+      GROUP BY c.city
+      ORDER BY total_value DESC
+      LIMIT 3

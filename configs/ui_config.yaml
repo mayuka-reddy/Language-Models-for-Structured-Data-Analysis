@@ -1,0 +1,60 @@
+# UI Configuration for NL-to-SQL Assistant
+
+ui:
+  # Interface settings
+  title: "NL-to-SQL Assistant"
+  description: "Convert natural language questions into SQL queries"
+  theme: "soft"  # gradio theme
+  
+  # Server settings
+  host: "0.0.0.0"
+  port: 7860
+  share: false
+  debug: true
+  
+  # Display settings
+  max_rows_display: 100
+  max_chart_points: 1000
+  default_chart_type: "auto"
+  
+  # Sample questions
+  sample_questions:
+    - "Show me all customers"
+    - "What are the total sales by region?"
+    - "Find the top 5 products by price"
+    - "How many orders were placed?"
+    - "What is the average order value?"
+    - "Which customers have spent the most?"
+    - "Show me recent orders"
+    - "What products are in stock?"
+  
+  # Chart settings
+  charts:
+    default_style: "plotly"  # plotly or matplotlib
+    color_palette: "husl"
+    figure_size: [10, 6]
+    dpi: 150
+  
+  # Insights settings
+  insights:
+    max_insights: 10
+    max_recommendations: 5
+    show_statistics: true
+    show_data_types: true
+
+# Database settings
+database:
+  default_path: "data/sample_retail.db"
+  type: "sqlite"  # sqlite or duckdb
+  connection_timeout: 30
+  query_timeout: 60
+  
+# Evaluation settings
+evaluation:
+  enable_model_comparison: true
+  test_dataset_size: 10
+  metrics:
+    - "execution_correctness"
+    - "exact_match"
+    - "schema_compliance"
+    - "bleu_score"

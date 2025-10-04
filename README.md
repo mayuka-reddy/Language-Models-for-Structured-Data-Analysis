@@ -1,336 +1,282 @@
-# 🚀 Language Models for Structured Data Analysis
+# 🚀 NL-to-SQL Assistant
 
-<div align="center">
+Convert natural language questions into SQL queries with instant execution, insights, and visualizations.
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)
+## ✨ Features
 
-**Bridging the gap between natural language and structured data through advanced LLM techniques**
+- **Natural Language to SQL**: Convert questions like "Show me top customers" to SQL queries using T5 model
+- **Instant Execution**: Run queries against a sample retail database (SQLite/DuckDB)
+- **Smart Insights**: Get automatic analysis and recommendations from results
+- **Interactive Charts**: Visualize data with auto-generated charts (bar, line, pie, scatter)
+- **Model Comparison**: Evaluate different NL-to-SQL models with comprehensive metrics
+- **Web Interface**: Clean, intuitive Gradio-based UI
 
-[📊 Dataset](#-dataset) • [🔧 Technical Approach](#-technical-approach) • [📈 Results](#-results) • [👥 Team](#-team) • [🚀 Getting Started](#-getting-started)
+## 🏗️ Architecture
 
-</div>
-
----
-
-## 🎯 Project Overview
-
-### The Problem
-Industries store valuable knowledge in structured datasets (SQL, Parquet, CSV), but **non-technical users struggle to derive insights** because querying requires SQL expertise, schema knowledge, and data semantics understanding.
-
-### Our Solution
-We propose an **intelligent system** that converts natural-language questions into proper structured operations, returning accurate results with comprehensible explanations and schema grounding.
-
-### Why It Matters
-- 🔓 **Democratizes Data Access**: Brings non-technical users to data without compromising accuracy
-- ⚡ **Saves Time**: Focuses analysts on interpretation rather than query construction
-- 🎯 **Real-world Ready**: Adaptable to various datasets and domain-specific terminology
-- 🧠 **AI-Powered**: Demonstrates how LLMs can become helpful data assistants
-
----
-
-## 📊 Dataset
-
-We use the **Olist Brazilian E-Commerce Public Dataset** (Kaggle) with ~100,000 customer orders from 2016-2018.
-
-### 📋 Dataset Structure
-
-| Dataset Type | Rows | Columns | Description |
-|-------------|------|---------|-------------|
-| **Item-Level** | 112,650 | 37 | Detailed item-level data with sellers, buyers, products, payments, reviews |
-| **Order-Level** | 98,666 | 13 | Aggregated order-level data with financial summaries and shipping metrics |
-
-### 🔍 Sample Queries Our System Handles
-- *"What categories have the highest freight costs?"*
-- *"Do late shipments decrease review scores?"*
-- *"Which sellers have the best delivery performance?"*
-- *"What's the average payment value by customer state?"*
-
----
-
-## 🔧 Technical Approach
-
-Our system combines **three cutting-edge techniques** to achieve state-of-the-art performance:
-
-### 🧠 1. Advanced Prompting Strategies
-We implement and compare four sophisticated prompting methods:
-
-```mermaid
-graph TD
-    A[Natural Language Query] --> B[Prompting Strategy Selection]
-    B --> C[Chain-of-Thought]
-    B --> D[Few-Shot Learning]
-    B --> E[Self-Consistency]
-    B --> F[Least-to-Most]
-    C --> G[SQL Generation]
-    D --> G
-    E --> G
-    F --> G
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Gradio UI     │───▶│  T5 Inference    │───▶│  SQL Executor   │
+│                 │    │                  │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                                               │
+         ▼                                               ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│ Chart Generator │    │ Insights Engine  │    │ Sample Database │
+│                 │    │                  │    │ (SQLite/DuckDB) │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-| Strategy | Description | Use Case |
-|----------|-------------|----------|
-| **Chain-of-Thought** | Step-by-step reasoning | Complex multi-table queries |
-| **Few-Shot Learning** | Learning from examples | Domain-specific terminology |
-| **Self-Consistency** | Multiple reasoning paths | Reducing hallucinations |
-| **Least-to-Most** | Decomposing complex problems | Nested queries and aggregations |
-
-### 🔍 2. Schema-Aware RAG Pipeline
-Our retrieval system goes beyond traditional text-based RAG:
-
-```mermaid
-graph LR
-    A[Query] --> B[Schema Understanding]
-    B --> C[Metadata Retrieval]
-    C --> D[Column-Level Grounding]
-    D --> E[Context Assembly]
-    E --> F[SQL Synthesis]
-```
-
-**Key Innovations:**
-- 🎯 **Schema Grounding**: Retrieval based on database metadata, not just text similarity
-- 🔗 **Multi-table Reasoning**: Handles complex joins across customers, orders, products, reviews
-- 📊 **Column-Level Precision**: Understands data types, constraints, and relationships
-
-### 🎛️ 3. Fine-Tuning Strategies
-We benchmark three fine-tuning approaches for optimal performance:
-
-| Method | Description | Advantages |
-|--------|-------------|------------|
-| **SFT** | Supervised Fine-Tuning | Full model adaptation |
-| **LoRA** | Low-Rank Adaptation | Efficient parameter updates |
-| **QLoRA** | Quantized LoRA | Memory-efficient training |
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TB
-    subgraph "Input Layer"
-        A[Natural Language Query]
-    end
-    
-    subgraph "Processing Layer"
-        B[Query Understanding]
-        C[Schema-Aware RAG]
-        D[Prompting Strategy]
-        E[Fine-Tuned LLM]
-    end
-    
-    subgraph "Output Layer"
-        F[SQL Query]
-        G[Execution Results]
-        H[Natural Language Explanation]
-    end
-    
-    subgraph "Data Layer"
-        I[Olist Dataset]
-        J[Schema Metadata]
-        K[Query Examples]
-    end
-    
-    A --> B
-    B --> C
-    B --> D
-    C --> E
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    
-    I --> C
-    J --> C
-    K --> D
-```
-
----
-
-## 📈 Results
-
-### 🎯 Evaluation Metrics
-
-| Metric | Description | Target |
-|--------|-------------|---------|
-| **Execution Correctness** | Accuracy of synthesized SQL queries | >90% |
-| **BLEU Score** | Natural language output quality | >0.8 |
-| **Schema Compliance** | Adherence to database constraints | 100% |
-| **Response Time** | Query processing speed | <5s |
-
-### 📊 Performance Comparison
-
-```mermaid
-graph LR
-    A[Baseline] --> B[+ Prompting] --> C[+ RAG] --> D[+ Fine-tuning]
-    A --> A1[65% Accuracy]
-    B --> B1[78% Accuracy]
-    C --> C1[85% Accuracy]
-    D --> D1[92% Accuracy]
-```
-
----
-
-## 👥 Team
-
-<div align="center">
-
-| Member | Focus Area | Key Contributions |
-|--------|------------|-------------------|
-| **Kushal Adhyaru**<br/>018202106 | 🧠 Prompting Strategies | 4 prompting methods implementation<br/>Project coordination |
-| **Prem Shah**<br/>017777045 | 🔍 RAG Implementation | Schema-aware retrieval pipeline<br/>Hybrid search optimization |
-| **Mayuka Kothuru**<br/>017609436 | 🎛️ Fine-Tuning | SFT/LoRA/QLoRA training<br/>Model optimization |
-| **Sri Gopi Sarath Gode**<br/>018191537 | 📊 Data & Evaluation | Data preprocessing<br/>Evaluation metrics & dashboards |
-
-</div>
-
-### 🗓️ Project Timeline
-
-```mermaid
-gantt
-    title Project Milestones
-    dateFormat  YYYY-MM-DD
-    section Milestones
-    M1: Prototype with datasets    :done, m1, 2024-01-01, 3w
-    M2: Prompting results          :done, m2, 2024-01-22, 2w
-    M3: RAG system integration     :done, m3, 2024-02-05, 2w
-    M4: Fine-tuning results        :done, m4, 2024-02-19, 3w
-    M5: Final evaluation report    :active, m5, 2024-03-11, 2w
-```
-
----
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.8+
-- CUDA-compatible GPU (recommended)
-- 8GB+ RAM
+- 4GB+ RAM (8GB recommended)
+- Internet connection (for model downloads)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/Language-Models-for-Structured-Data-Analysis.git
-cd Language-Models-for-Structured-Data-Analysis
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+git clone https://github.com/your-username/nl2sql-assistant.git
+cd nl2sql-assistant
 
 # Install dependencies
 pip install -r requirements.txt
+pip install -r missing_deps.txt
 
-# Download and setup dataset
-python scripts/setup_dataset.py
+# Start the web interface
+python ui/gradio_app.py
 ```
 
-### Quick Start
+Open http://localhost:7860 in your browser!
+
+### Using Makefile
+
+```bash
+# Complete setup
+make setup
+
+# Start UI
+make run-ui
+```
+
+## 💡 Usage Examples
+
+### Basic Queries
+- "Show me all customers"
+- "What are the total sales?"
+- "Find the top 5 products by price"
+
+### Advanced Queries
+- "Which region has the highest average order value?"
+- "Show me customers who have placed more than 3 orders"
+- "What's the monthly sales trend?"
+
+### Sample Database Schema
+
+The system includes a sample retail database with:
+
+- **customers**: customer_id, name, email, region, signup_date
+- **products**: product_id, name, category, price, stock_quantity  
+- **orders**: order_id, customer_id, order_date, total_amount, status
+- **order_items**: order_item_id, order_id, product_id, quantity, unit_price
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+make test
+
+# Run specific test modules
+make test-inference
+make test-executor
+make test-metrics
+
+# Generate coverage report
+make coverage
+```
+
+## 📊 Model Evaluation
+
+The system includes comprehensive evaluation metrics:
+
+- **Execution Correctness**: Does the SQL produce correct results?
+- **Exact Match**: Does the SQL exactly match the expected query?
+- **Schema Compliance**: Does the SQL follow database schema rules?
+- **BLEU Score**: How similar is the generated SQL to expected SQL?
+
+Access model comparison through the "Model Comparison" tab in the UI.
+
+## 🛠️ Development
+
+### Code Structure
+
+```
+nl2sql-assistant/
+├── app/                    # Core backend logic
+│   ├── inference.py       # T5 model inference
+│   ├── sql_executor.py    # Database query execution
+│   ├── insights.py        # Result analysis
+│   ├── charts.py          # Visualization generation
+│   └── metrics.py         # Model evaluation
+├── ui/                    # Gradio web interface
+│   └── gradio_app.py      # Main UI application
+├── configs/               # Configuration files
+├── tests/                 # Unit tests
+├── models/                # Model storage and utilities
+└── notebooks/             # Jupyter demos (optional)
+```
+
+### Development Workflow
+
+```bash
+# Install development dependencies
+make dev-install
+
+# Format code
+make format
+
+# Lint code
+make lint
+
+# Run development checks
+make dev
+```
+
+### Configuration
+
+Edit `configs/model_config.yaml` to customize:
+- Model selection (t5-small, t5-base, flan-t5-small, etc.)
+- Generation parameters (beam size, temperature)
+- Performance settings
+
+Edit `configs/ui_config.yaml` to customize:
+- UI appearance and behavior
+- Chart settings
+- Sample questions
+
+## 🔧 Customization
+
+### Adding New Models
+
+1. Update `configs/model_config.yaml`:
+```yaml
+model:
+  name: "your-custom-model"
+  max_input_length: 512
+  max_output_length: 256
+```
+
+2. Ensure model follows T5 format or implement custom adapter
+
+### Custom Database
+
+Replace the sample database by modifying `SQLExecutor` initialization:
 
 ```python
-from src.query_processor import NaturalLanguageQueryProcessor
-
-# Initialize the system
-processor = NaturalLanguageQueryProcessor()
-
-# Ask a natural language question
-query = "What are the top 5 product categories by total sales?"
-result = processor.process_query(query)
-
-print(f"SQL Query: {result.sql}")
-print(f"Results: {result.data}")
-print(f"Explanation: {result.explanation}")
+executor = SQLExecutor("path/to/your/database.db", "sqlite")
 ```
 
-### Example Queries
+### Custom Insights
+
+Extend `InsightsGenerator` class to add domain-specific analysis:
 
 ```python
-# Financial Analysis
-"What's the average order value by customer state?"
-
-# Performance Metrics
-"Which sellers have the fastest delivery times?"
-
-# Trend Analysis
-"How do review scores correlate with delivery delays?"
-
-# Business Intelligence
-"What's the customer retention rate by region?"
+class CustomInsightsGenerator(InsightsGenerator):
+    def _analyze_business_metrics(self, df):
+        # Your custom analysis logic
+        pass
 ```
+
+## 📈 Performance
+
+### Model Performance
+- **t5-small**: ~1s per query, good accuracy
+- **t5-base**: ~2s per query, better accuracy
+- **flan-t5-small**: ~1s per query, instruction-tuned
+
+### System Requirements
+- **Minimum**: 4GB RAM, CPU-only
+- **Recommended**: 8GB RAM, GPU with 2GB VRAM
+- **Storage**: ~2GB for models and data
+
+### Optimization Tips
+1. Use GPU for faster inference
+2. Keep models loaded in memory
+3. Use smaller models for development
+4. Batch multiple queries together
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**"Model download failed"**
+- Check internet connection
+- Verify disk space (models are ~200MB each)
+- Try different model in config
+
+**"Database connection error"**
+- Run `make create-data` to recreate sample database
+- Check file permissions in data directory
+
+**"Out of memory"**
+- Use smaller model (t5-small instead of t5-base)
+- Reduce batch size in config
+- Close other applications
+
+**"Slow inference"**
+- Enable GPU if available
+- Use smaller model for development
+- Check system resources
+
+### Getting Help
+
+1. Check the logs in the terminal
+2. Run `make test` to verify installation
+3. Try with sample questions first
+4. Check configuration files for typos
+
+## 🚧 Roadmap
+
+### Phase 1 (Current)
+- ✅ Basic NL-to-SQL conversion
+- ✅ Web interface
+- ✅ Sample database
+- ✅ Basic insights and charts
+- ✅ Model evaluation metrics
+
+### Phase 2 (Future)
+- 🔄 Schema-aware RAG integration
+- 🔄 Fine-tuned model training
+- 🔄 Advanced prompting strategies
+- 🔄 Multi-database support
+- 🔄 Query optimization suggestions
+
+### Phase 3 (Future)
+- 🔄 Production deployment
+- 🔄 API endpoints
+- 🔄 User authentication
+- 🔄 Query history and favorites
+- 🔄 Advanced analytics dashboard
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+- 📧 Email: support@nl2sql-assistant.com
+- 💬 Issues: GitHub Issues
+- 📖 Documentation: This README and inline code comments
 
 ---
 
-## 📁 Project Structure
-
-```
-├── 📁 src/
-│   ├── 📁 prompting/          # Prompting strategies implementation
-│   ├── 📁 rag/               # Schema-aware RAG pipeline
-│   ├── 📁 fine_tuning/       # Model fine-tuning scripts
-│   ├── 📁 evaluation/        # Evaluation metrics and benchmarks
-│   └── 📁 utils/             # Utility functions
-├── 📁 data/                  # Dataset and processed files
-├── 📁 models/                # Trained model checkpoints
-├── 📁 notebooks/             # Jupyter notebooks for analysis
-├── 📁 docs/                  # Documentation and reports
-└── 📁 scripts/               # Setup and utility scripts
-```
-
----
-
-## 🔬 Research Contributions
-
-### Novel Approaches
-1. **Unified Framework**: First system to combine advanced prompting, schema-aware RAG, and fine-tuning
-2. **Schema Grounding**: RAG pipeline specifically designed for relational databases
-3. **Multi-Strategy Prompting**: Comprehensive comparison of reasoning strategies
-4. **Execution-Aware Training**: Fine-tuning focused on query correctness, not just language
-
-### Academic Impact
-- 📚 **Conference Paper**: Submitted to top-tier NLP/ML conferences
-- 🎓 **Open Source**: Contributing to the research community
-- 🔬 **Reproducible**: Complete codebase and evaluation framework
-
----
-
-<div align="center">
-
-**⭐ Star this repository if you find it helpful!**
-
-Made with ❤️ by the Structured Data Analysis Team
-
-</div>
-
----
-
-## Quick dev start (local testing)
-
-If you want a minimal workflow to validate the Python code without loading large models or a database, follow these steps:
-
-1. Create and activate a virtualenv:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-2. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Run tests (a small unit test exists for SchemaManager):
-
-```bash
-pytest -q
-```
-
-4. Start the API (uses DummyModel by default):
-
-```bash
-uvicorn src.api.main:app --reload
-```
-
-Notes:
-- The default NL2SQL generator uses `DummyModel` for quick local testing. Replace it with your model wrapper when ready.
-- For schema reflection, set `DATABASE_URL` in the environment to point to a Postgres instance.
+**Made with ❤️ for the data community**

@@ -1,0 +1,201 @@
+# CI/CD Pipeline for NL-to-SQL Assistant
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Code quality and testing
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, "3.10"]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    
+    - name: Lint with flake8
+      run: |
+        flake8 src/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+    
+    - name: Format check with black
+      run: |
+        black --check src/ tests/
+    
+    - name: Type check with mypy
+      run: |
+        mypy src/ --ignore-missing-imports
+    
+    - name: Test with pytest
+      run: |
+        pytest tests/ -v --cov=src --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Mini evaluation on sample data
+  mini-eval:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create sample data
+      run: |
+        python data/build_duckdb.py
+    
+    - name: Run mini evaluation
+      run: |
+        python -c "
+        from eval.metrics import create_sample_evaluation_data
+        create_sample_evaluation_data('eval/sample_predictions.json')
+        print('Mini evaluation completed')
+        "
+
+  # Security scanning
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run Bandit security scan
+      run: |
+        pip install bandit
+        bandit -r src/ -f json -o bandit-report.json || true
+    
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-scan
+        path: bandit-report.json
+
+  # Build and test Docker images
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build API Docker image
+      run: |
+        docker build -f docker/Dockerfile.app -t nl2sql-api:test .
+    
+    - name: Test API container
+      run: |
+        docker run --rm -d --name test-api -p 8000:8000 nl2sql-api:test
+        sleep 10
+        # Test health endpoint (would need to add health endpoint to API)
+        # curl -f http://localhost:8000/health || exit 1
+        docker stop test-api
+
+  # Performance benchmarking (on main branch only)
+  benchmark:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run performance benchmark
+      run: |
+        python -c "
+        import time
+        from src.models.nl2sql import NL2SQLGenerator
+        
+        # Simple performance test
+        generator = NL2SQLGenerator()
+        start_time = time.time()
+        
+        for i in range(10):
+            result = generator.generate(
+                'Which city has the most customers?',
+                {'schema_graph_brief': 'customer(city, customer_id)'}
+            )
+        
+        avg_time = (time.time() - start_time) / 10
+        print(f'Average generation time: {avg_time:.3f}s')
+        
+        # Fail if too slow
+        if avg_time > 5.0:
+            exit(1)
+        "
+
+  # Deployment (only on main branch)
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [test, mini-eval, docker-build]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add actual deployment steps here
+        # e.g., push to container registry, update k8s deployment, etc.
+    
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests on staging..."
+        # Add smoke test steps here
+    
+    - name: Notify team
+      run: |
+        echo "Deployment completed successfully!"
+        # Add notification steps (Slack, email, etc.)
