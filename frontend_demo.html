@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Model Performance Demo - Results Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .results-table th {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .strategy-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .chain-of-thought { background: #e74c3c; }
+        .few-shot { background: #f39c12; }
+        .self-consistency { background: #27ae60; }
+        .least-to-most { background: #9b59b6; }
+        
+        .sql-code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #27ae60 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ML Model Performance Demo</h1>
+            <p>Real-time results from enhanced prompting strategies, RAG pipeline, and metrics evaluation</p>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">Loading demo results...</div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📊 Strategy Performance Comparison</h2>
+                <div class="chart-container">
+                    <canvas id="strategyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🎯 Question Results</h2>
+                <div id="questionResults">
+                    <div class="loading">Loading question results...</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔍 RAG Pipeline Performance</h2>
+                <div class="chart-container">
+                    <canvas id="ragChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📈 Metrics Summary</h2>
+                <div id="metricsResults">
+                    <div class="loading">Loading metrics...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and display demo results
+        async function loadDemoResults() {
+            try {
+                const response = await fetch('demo_results/demo_results.json');
+                const data = await response.json();
+                
+                displayStats(data);
+                displayStrategyChart(data);
+                displayQuestionResults(data);
+                displayRAGChart(data);
+                displayMetrics(data);
+                
+            } catch (error) {
+                console.error('Error loading demo results:', error);
+                document.getElementById('statsGrid').innerHTML = 
+                    '<div class="error">Error loading demo results. Please run demo_runner.py first.</div>';
+            }
+        }
+        
+        function displayStats(data) {
+            const stats = [
+                {
+                    title: 'Best Strategy',
+                    value: data.summary.best_strategy.replace('_', ' ').toUpperCase(),
+                    label: 'Highest Performance'
+                },
+                {
+                    title: 'Questions Tested',
+                    value: data.demo_info.total_questions,
+                    label: 'E-commerce Queries'
+                },
+                {
+                    title: 'Execution Accuracy',
+                    value: (data.summary.execution_accuracy * 100).toFixed(1) + '%',
+                    label: 'SQL Correctness'
+                },
+                {
+                    title: 'Avg Retrieval Time',
+                    value: (data.summary.avg_retrieval_time * 1000).toFixed(1) + 'ms',
+                    label: 'RAG Performance'
+                }
+            ];
+            
+            const statsHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <h3>${stat.title}</h3>
+                    <div class="stat-value">${stat.value}</div>
+                    <div class="stat-label">${stat.label}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('statsGrid').innerHTML = statsHTML;
+        }
+        
+        function displayStrategyChart(data) {
+            const ctx = document.getElementById('strategyChart').getContext('2d');
+            const strategies = data.prompting_strategies.strategy_performance;
+            
+            const labels = Object.keys(strategies).map(s => s.replace('_', ' ').toUpperCase());
+            const successRates = Object.values(strategies).map(s => s.success_rate * 100);
+            const executionTimes = Object.values(strategies).map(s => s.avg_execution_time * 1000);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: successRates,
+                        backgroundColor: ['#e74c3c', '#f39c12', '#27ae60', '#9b59b6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Strategy Success Rates'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function displayQuestionResults(data) {
+            const questions = data.prompting_strategies.question_results;
+            
+            let html = '<table class="results-table"><thead><tr><th>Question</th><th>Best Strategy</th><th>Generated SQL</th><th>Confidence</th></tr></thead><tbody>';
+            
+            Object.entries(questions).forEach(([question, strategies]) => {
+                // Find best strategy for this question
+                let bestStrategy = null;
+                let bestConfidence = 0;
+                
+                Object.entries(strategies).forEach(([strategyName, result]) => {
+                    if (result.success && result.confidence > bestConfidence) {
+                        bestStrategy = strategyName;
+                        bestConfidence = result.confidence;
+                    }
+                });
+                
+                if (bestStrategy) {
+                    const result = strategies[bestStrategy];
+                    html += `
+                        <tr>
+                            <td><strong>${question}</strong></td>
+                            <td><span class="strategy-badge ${bestStrategy}">${bestStrategy.replace('_', ' ').toUpperCase()}</span></td>
+                            <td><div class="sql-code">${result.generated_sql}</div></td>
+                            <td>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: ${result.confidence * 100}%"></div>
+                                </div>
+                                ${(result.confidence * 100).toFixed(1)}%
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('questionResults').innerHTML = html;
+        }
+        
+        function displayRAGChart(data) {
+            const ctx = document.getElementById('ragChart').getContext('2d');
+            const ragData = data.rag_pipeline;
+            
+            const questions = Object.keys(ragData.context_examples);
+            const retrievalTimes = Object.values(ragData.context_examples).map(ex => ex.retrieval_time * 1000);
+            const relevanceScores = Object.values(ragData.context_examples).map(ex => ex.relevance_score * 100);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: questions.map((q, i) => `Q${i+1}`),
+                    datasets: [{
+                        label: 'Retrieval Time (ms)',
+                        data: retrievalTimes,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Relevance Score (%)',
+                        data: relevanceScores,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'RAG Pipeline Performance'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function displayMetrics(data) {
+            const metrics = data.metrics_calculation;
+            
+            let html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Average BLEU Score</h3>
+                        <div class="stat-value">${(metrics.performance_data.average_bleu_score * 100).toFixed(1)}%</div>
+                        <div class="stat-label">SQL Similarity</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Execution Accuracy</h3>
+                        <div class="stat-value">${(metrics.performance_data.execution_accuracy * 100).toFixed(1)}%</div>
+                        <div class="stat-label">Query Correctness</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Schema Compliance</h3>
+                        <div class="stat-value">${(metrics.performance_data.schema_compliance_rate * 100).toFixed(1)}%</div>
+                        <div class="stat-label">Schema Adherence</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Samples</h3>
+                        <div class="stat-value">${metrics.performance_data.total_samples}</div>
+                        <div class="stat-label">Evaluated Queries</div>
+                    </div>
+                </div>
+                
+                <h3>Sample Evaluations</h3>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>BLEU Score</th>
+                            <th>Execution</th>
+                            <th>Schema Compliant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            Object.entries(metrics.sample_metrics).forEach(([key, sample]) => {
+                html += `
+                    <tr>
+                        <td>${sample.question}</td>
+                        <td>${(sample.bleu_score * 100).toFixed(1)}%</td>
+                        <td>${sample.execution_correct ? '✅ Correct' : '❌ Failed'}</td>
+                        <td>${sample.schema_compliant ? '✅ Compliant' : '❌ Non-compliant'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('metricsResults').innerHTML = html;
+        }
+        
+        // Load results when page loads
+        document.addEventListener('DOMContentLoaded', loadDemoResults);
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+# Least-to-Most Decomposition Template for Complex Queries
+# Owner: Kushal Adhyaru
+
+system_prompt: |
+  You are an expert SQL analyst specializing in breaking down complex database questions 
+  into simpler, manageable sub-problems. Solve each sub-problem step by step, then 
+  combine the solutions into a comprehensive final query.
+
+decomposition_framework: |
+  Follow this systematic decomposition process:
+  
+  1. Question Analysis: Break down the main question into component parts
+  2. Schema Mapping: Identify required tables, columns, and relationships
+  3. Operation Planning: Determine SQL operations needed (JOINs, aggregations, filters)
+  4. Sub-query Design: Plan any necessary sub-queries or CTEs
+  5. Integration: Combine sub-solutions into the final query
+  6. Validation: Verify the final query addresses all question components
+
+decomposition_patterns:
+  complex_aggregation:
+    description: "Questions requiring multiple levels of aggregation"
+    sub_problems:
+      - "What data needs to be aggregated?"
+      - "At what levels should aggregation occur?"
+      - "How should results be grouped and ordered?"
+    example: "Find customers who spent more than the average customer in their city"
+    
+  multi_table_analysis:
+    description: "Questions spanning multiple related tables"
+    sub_problems:
+      - "Which tables contain the required data?"
+      - "How are these tables related?"
+      - "What join conditions are needed?"
+      - "Are there any data quality considerations?"
+    example: "Show product performance by category and delivery region"
+    
+  temporal_comparison:
+    description: "Questions comparing data across time periods"
+    sub_problems:
+      - "What time periods need to be compared?"
+      - "How should dates be grouped or filtered?"
+      - "What metrics need to be calculated for each period?"
+      - "How should the comparison be presented?"
+    example: "Compare monthly sales growth year-over-year"
+    
+  conditional_logic:
+    description: "Questions with complex business rules or conditions"
+    sub_problems:
+      - "What are the specific conditions or rules?"
+      - "How should edge cases be handled?"
+      - "What is the priority order of conditions?"
+      - "Are there any business logic validations needed?"
+    example: "Classify customers as VIP, Regular, or New based on purchase history"
+
+output_format: |
+  {
+    "question_analysis": {
+      "main_question": "Restated version of the original question",
+      "complexity_type": "complex_aggregation|multi_table_analysis|temporal_comparison|conditional_logic",
+      "key_components": ["component1", "component2", "component3"]
+    },
+    "decomposition": [
+      {
+        "step": 1,
+        "sub_question": "What tables and columns are needed?",
+        "answer": "Detailed answer with specific table/column names",
+        "sql_fragment": "Relevant SQL snippet if applicable"
+      },
+      {
+        "step": 2, 
+        "sub_question": "What joins are required?",
+        "answer": "Explanation of join logic and conditions",
+        "sql_fragment": "JOIN clauses"
+      },
+      {
+        "step": 3,
+        "sub_question": "What filters or conditions apply?",
+        "answer": "Business logic and filter conditions",
+        "sql_fragment": "WHERE clause components"
+      },
+      {
+        "step": 4,
+        "sub_question": "What aggregations or calculations are needed?",
+        "answer": "Aggregation logic and grouping strategy", 
+        "sql_fragment": "GROUP BY and aggregate functions"
+      },
+      {
+        "step": 5,
+        "sub_question": "How should results be ordered and limited?",
+        "answer": "Sorting and result limiting logic",
+        "sql_fragment": "ORDER BY and LIMIT clauses"
+      }
+    ],
+    "integration_strategy": "Explanation of how sub-solutions combine",
+    "final_sql": "Complete SQL query combining all sub-solutions",
+    "validation_checks": [
+      "Does the query answer the original question completely?",
+      "Are all business rules properly implemented?", 
+      "Is the query syntactically correct?",
+      "Are there any potential performance issues?"
+    ],
+    "confidence": 0.88
+  }
+
+example_decomposition: |
+  Question: "Find the top 3 product categories by total revenue, but only include categories 
+           where the average order value is above $50 and there were at least 100 orders"
+           
+  This breaks down into:
+  1. Calculate total revenue per category (SUM aggregation)
+  2. Calculate average order value per category (AVG aggregation) 
+  3. Count orders per category (COUNT aggregation)
+  4. Filter categories meeting the criteria (HAVING clause)
+  5. Sort by revenue and limit to top 3 (ORDER BY + LIMIT)
+  
+  Each step builds on the previous ones to create the complete solution.

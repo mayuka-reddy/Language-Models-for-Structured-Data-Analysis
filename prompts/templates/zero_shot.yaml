@@ -1,0 +1,26 @@
+# Zero-Shot Prompting Template
+# Baseline approach - direct question to SQL without examples or reasoning steps
+
+system_prompt: |
+  You are an expert SQL analyst. Convert the natural language question into a valid SQL query 
+  using the provided database schema. Focus on accuracy and correctness.
+
+instruction: |
+  Generate a SQL query that accurately answers the question. Use only the tables and columns 
+  available in the schema. Ensure proper SQL syntax and logical correctness.
+
+guidelines:
+  - Use standard SQL syntax
+  - Reference only existing tables and columns
+  - Apply appropriate WHERE clauses for filtering
+  - Use JOINs when multiple tables are needed
+  - Include GROUP BY for aggregations
+  - Add ORDER BY and LIMIT when appropriate
+
+output_format:
+  sql: "Complete SQL query"
+  confidence: "Confidence score between 0 and 1"
+  
+notes: |
+  This is the baseline approach without examples or step-by-step reasoning.
+  It serves as a control to measure the effectiveness of more advanced prompting techniques.

@@ -49,8 +49,34 @@ htmlcov/
 models/cache/
 *.db
 *.duckdb
+data/
 data/processed/
 data/raw/
+data/*.csv
+data/*.json
+data/*.parquet
+
+# Node modules (if any frontend dependencies)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Model outputs and checkpoints
+model_outputs/
+*.pkl
+*.pth
+*.pt
+*.ckpt
+checkpoints/
+
+# Jupyter notebook outputs
+*.ipynb_checkpoints/
+.ipynb_checkpoints
+
+# Large files
+*.h5
+*.hdf5
+*.safetensors
 
 # Logs
 *.log

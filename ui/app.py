@@ -1,6 +1,6 @@
 """
-Gradio UI for NL-to-SQL Assistant.
-Interactive interface for querying, comparing strategies, and visualizing results.
+Enhanced Gradio UI for NL-to-SQL Assistant.
+Production-ready interface with automatic results loading and comprehensive visualizations.
 """
 
 import gradio as gr
@@ -10,11 +10,45 @@ import pandas as pd
 from typing import Dict, List, Any, Optional, Tuple
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from pathlib import Path
+import pickle
+import sys
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 # Configuration
 API_BASE_URL = "http://localhost:8000"
-STRATEGIES = ["chain_of_thought", "few_shot", "self_consistency", "least_to_most"]
+STRATEGIES = ["zero_shot", "chain_of_thought", "few_shot", "self_consistency", "least_to_most"]
+
+# Load trained model results
+def load_trained_model_results():
+    """Load trained model results from multiple possible locations."""
+    possible_paths = [
+        Path('../results/models/trained_results.json'),
+        Path('results/models/trained_results.json'),
+        Path('../model_outputs/model_results.json'),
+        Path('model_outputs/model_results.json'),
+        Path('data/model_results.json')
+    ]
+    
+    for path in possible_paths:
+        if path.exists():
+            try:
+                with open(path, 'r') as f:
+                    results = json.load(f)
+                    print(f"✅ Loaded training results from: {path}")
+                    return results
+            except Exception as e:
+                print(f"⚠️  Error loading {path}: {e}")
+    
+    print("⚠️  No training results found. Run: python scripts/train_all_techniques.py")
+    return None
+
+# Load model results at startup
+TRAINED_MODEL_RESULTS = load_trained_model_results()
 
 
 class NL2SQLInterface:
@@ -260,6 +294,151 @@ class NL2SQLInterface:
         
         html += "</div>"
         return html
+    
+    def _create_model_performance_tab(self):
+        """Create enhanced model performance display tab with comprehensive visualizations."""
+        if not TRAINED_MODEL_RESULTS:
+            return gr.Markdown("""
+            ## ⚠️ No Training Results Found
+            
+            Please run the training script first:
+            ```bash
+            python scripts/train_all_techniques.py
+            ```
+            
+            This will generate all results and metrics automatically.
+            """)
+        
+        # Extract performance data
+        if 'model_performance' in TRAINED_MODEL_RESULTS:
+            # Old format
+            model_perf = TRAINED_MODEL_RESULTS['model_performance']
+            best_strategy = model_perf['best_strategy']
+            overall = model_perf['overall_summary']
+            strategy_results = model_perf['strategy_results']
+        else:
+            # New format from train_all_techniques.py
+            strategy_results = TRAINED_MODEL_RESULTS.get('strategy_results', {})
+            if not strategy_results:
+                return gr.Markdown("## ⚠️ Invalid results format")
+            
+            # Calculate best strategy
+            best_strategy = max(strategy_results.items(),
+                              key=lambda x: x[1].get('avg_bleu_score', 0))[0]
+            
+            # Calculate overall metrics
+            overall = {
+                'avg_success_rate': sum(s.get('success_rate', 0) for s in strategy_results.values()) / len(strategy_results),
+                'avg_bleu_score': sum(s.get('avg_bleu_score', 0) for s in strategy_results.values()) / len(strategy_results),
+                'avg_execution_accuracy': sum(s.get('execution_accuracy', 0) for s in strategy_results.values()) / len(strategy_results),
+                'total_strategies': len(strategy_results),
+                'total_questions': TRAINED_MODEL_RESULTS.get('metadata', {}).get('total_questions', 10)
+            }
+        
+        # Performance Summary
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown(f"""
+                ## 🏆 Training Results Summary
+                
+                **Best Strategy:** {best_strategy.replace('_', ' ').title()}  
+                **Overall Success Rate:** {overall['avg_success_rate']:.1%}  
+                **Average BLEU Score:** {overall['avg_bleu_score']:.3f}  
+                **Average Execution Accuracy:** {overall['avg_execution_accuracy']:.1%}  
+                **Total Questions Tested:** {overall['total_questions']}  
+                **Training Completed:** {TRAINED_MODEL_RESULTS['metadata']['timestamp'][:19]}
+                """)
+            
+            with gr.Column():
+                # Create strategy comparison chart
+                strategies = list(strategy_results.keys())
+                success_rates = [strategy_results[s]['success_rate'] for s in strategies]
+                bleu_scores = [strategy_results[s]['avg_bleu_score'] for s in strategies]
+                
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    name='Success Rate',
+                    x=[s.replace('_', ' ').title() for s in strategies],
+                    y=success_rates,
+                    yaxis='y',
+                    offsetgroup=1
+                ))
+                fig.add_trace(go.Bar(
+                    name='BLEU Score',
+                    x=[s.replace('_', ' ').title() for s in strategies],
+                    y=bleu_scores,
+                    yaxis='y2',
+                    offsetgroup=2
+                ))
+                
+                fig.update_layout(
+                    title='Strategy Performance Comparison',
+                    xaxis_title='Strategy',
+                    yaxis=dict(title='Success Rate', side='left'),
+                    yaxis2=dict(title='BLEU Score', side='right', overlaying='y'),
+                    barmode='group',
+                    height=400
+                )
+                
+                gr.Plot(value=fig)
+        
+        # Detailed Results Table
+        gr.Markdown("## 📊 Detailed Strategy Results")
+        
+        # Create detailed results table
+        detailed_data = []
+        for strategy, metrics in strategy_results.items():
+            detailed_data.append({
+                'Strategy': strategy.replace('_', ' ').title(),
+                'Success Rate': f"{metrics['success_rate']:.1%}",
+                'BLEU Score': f"{metrics['avg_bleu_score']:.3f}",
+                'Execution Accuracy': f"{metrics['execution_accuracy']:.1%}",
+                'Avg Confidence': f"{metrics['avg_confidence']:.3f}",
+                'Avg Time (ms)': f"{metrics['avg_execution_time']*1000:.2f}"
+            })
+        
+        detailed_df = pd.DataFrame(detailed_data)
+        gr.Dataframe(value=detailed_df, interactive=False)
+        
+        # Sample Questions and Results
+        gr.Markdown("## 📝 Sample Training Questions & Results")
+        
+        sample_questions = TRAINED_MODEL_RESULTS['detailed_results']['question_by_question'][:3]
+        
+        for i, q_data in enumerate(sample_questions, 1):
+            with gr.Accordion(f"Question {i}: {q_data['question']}", open=False):
+                gr.Markdown(f"""
+                **Category:** {q_data['category']}  
+                **Complexity:** {q_data['complexity']}  
+                **Reference SQL:** 
+                ```sql
+                {q_data['reference_sql']}
+                ```
+                """)
+                
+                # Show results from best strategy
+                if best_strategy in q_data['strategy_results']:
+                    best_result = q_data['strategy_results'][best_strategy]
+                    gr.Markdown(f"""
+                    **Best Strategy Result ({best_strategy.replace('_', ' ').title()}):**
+                    ```sql
+                    {best_result['generated_sql']}
+                    ```
+                    **Confidence:** {best_result['confidence']:.3f}
+                    """)
+        
+        # RAG Performance
+        if 'rag_performance' in TRAINED_MODEL_RESULTS:
+            rag_perf = TRAINED_MODEL_RESULTS['rag_performance']
+            gr.Markdown(f"""
+            ## 🔍 RAG Pipeline Performance
+            
+            **Average Retrieval Time:** {rag_perf['avg_retrieval_time']:.4f}s  
+            **Average Relevance Score:** {rag_perf['avg_relevance_score']:.3f}  
+            **Schema Cards Indexed:** {rag_perf['total_schema_cards']}
+            """)
+        
+        return None
 
 
 def create_interface():
@@ -275,6 +454,21 @@ def create_interface():
         """)
         
         with gr.Tabs():
+            # Model Performance Tab (NEW)
+            with gr.TabItem("🏆 Model Performance"):
+                if TRAINED_MODEL_RESULTS:
+                    interface._create_model_performance_tab()
+                else:
+                    gr.Markdown("""
+                    ## ⚠️ No Trained Model Results Found
+                    
+                    Please run the training pipeline first:
+                    1. Open `ML_Model_Training_Pipeline.ipynb`
+                    2. Run all cells to train the model
+                    3. Run `python frontend_integration.py`
+                    4. Restart this UI
+                    """)
+            
             # Single Query Tab
             with gr.TabItem("Single Query"):
                 with gr.Row():

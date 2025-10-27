@@ -1,0 +1,119 @@
+# Enhanced Few-Shot Learning Template for E-commerce Domain
+# Owner: Kushal Adhyaru
+
+system_prompt: |
+  You are an expert SQL analyst specializing in e-commerce data analysis.
+  Learn from the provided examples and generate accurate SQL queries for similar questions.
+
+instruction: |
+  Study these domain-specific examples carefully. Notice the patterns in how different types of 
+  business questions are translated to SQL queries. Pay attention to common e-commerce operations
+  like aggregations, time-based analysis, and customer behavior patterns.
+
+examples:
+  # Customer Analysis Examples
+  - category: "customer_analysis"
+    question: "Which city has the highest number of customers?"
+    sql: |
+      SELECT customer_city, COUNT(*) as customer_count 
+      FROM customers 
+      GROUP BY customer_city 
+      ORDER BY customer_count DESC 
+      LIMIT 1
+    explanation: "Groups customers by city, counts them, and returns the city with the highest count"
+    complexity: "simple"
+    
+  - category: "customer_analysis"  
+    question: "Find customers who have made more than 5 orders"
+    sql: |
+      SELECT c.customer_id, c.customer_unique_id, COUNT(o.order_id) as order_count
+      FROM customers c
+      JOIN orders o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.customer_unique_id
+      HAVING COUNT(o.order_id) > 5
+    explanation: "Joins customers with orders, groups by customer, and filters using HAVING clause"
+    complexity: "medium"
+
+  # Product and Sales Analysis Examples  
+  - category: "product_analysis"
+    question: "What is the total revenue for each product category?"
+    sql: |
+      SELECT p.product_category_name, 
+             SUM(oi.price * oi.freight_value) as total_revenue
+      FROM products p
+      JOIN order_items oi ON p.product_id = oi.product_id
+      GROUP BY p.product_category_name
+      ORDER BY total_revenue DESC
+    explanation: "Joins products with order items, calculates revenue including freight, groups by category"
+    complexity: "medium"
+    
+  - category: "product_analysis"
+    question: "Which products have never been ordered?"
+    sql: |
+      SELECT p.product_id, p.product_category_name
+      FROM products p
+      LEFT JOIN order_items oi ON p.product_id = oi.product_id
+      WHERE oi.product_id IS NULL
+    explanation: "Uses LEFT JOIN to find products with no matching order items"
+    complexity: "medium"
+
+  # Time-based Analysis Examples
+  - category: "temporal_analysis"
+    question: "Show monthly order trends for 2017"
+    sql: |
+      SELECT DATE_FORMAT(order_purchase_timestamp, '%Y-%m') as month,
+             COUNT(*) as order_count,
+             SUM(payment_value) as total_value
+      FROM orders o
+      JOIN order_payments op ON o.order_id = op.order_id
+      WHERE YEAR(order_purchase_timestamp) = 2017
+      GROUP BY DATE_FORMAT(order_purchase_timestamp, '%Y-%m')
+      ORDER BY month
+    explanation: "Extracts month from timestamp, groups orders by month, includes payment aggregation"
+    complexity: "complex"
+
+  # Delivery and Logistics Examples
+  - category: "delivery_analysis"
+    question: "What is the average delivery time by state?"
+    sql: |
+      SELECT customer_state,
+             AVG(DATEDIFF(order_delivered_customer_date, order_purchase_timestamp)) as avg_delivery_days
+      FROM orders o
+      JOIN customers c ON o.customer_id = c.customer_id
+      WHERE order_delivered_customer_date IS NOT NULL
+      GROUP BY customer_state
+      ORDER BY avg_delivery_days
+    explanation: "Calculates date difference for delivery time, groups by state, excludes undelivered orders"
+    complexity: "medium"
+
+  # Payment Analysis Examples
+  - category: "payment_analysis"
+    question: "Which payment method is most popular for high-value orders (>200)?"
+    sql: |
+      SELECT payment_type, 
+             COUNT(*) as usage_count,
+             AVG(payment_value) as avg_payment_value
+      FROM order_payments
+      WHERE payment_value > 200
+      GROUP BY payment_type
+      ORDER BY usage_count DESC
+    explanation: "Filters high-value payments, groups by payment type, shows usage statistics"
+    complexity: "medium"
+
+output_format: |
+  Analyze the question type and select the most relevant example pattern.
+  Provide your response in JSON format:
+  {
+    "sql": "SELECT ...",
+    "explanation": "Brief explanation of the query logic and business context",
+    "confidence": 0.85,
+    "category": "customer_analysis|product_analysis|temporal_analysis|delivery_analysis|payment_analysis",
+    "complexity": "simple|medium|complex"
+  }
+
+strategy_notes: |
+  - For customer questions, focus on customer table joins and grouping
+  - For product questions, emphasize product-order_items relationships  
+  - For temporal analysis, use date functions and time-based grouping
+  - For delivery questions, calculate time differences and geographic grouping
+  - For payment analysis, focus on payment_type and payment_value patterns

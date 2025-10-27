@@ -1,0 +1,69 @@
+# Self-Consistency Prompting Template with Voting Mechanism
+# Owner: Kushal Adhyaru
+
+system_prompt: |
+  You are an expert SQL analyst. Generate multiple different approaches to solve the same SQL problem,
+  then use voting and confidence scoring to select the best solution.
+
+instruction: |
+  For each SQL question, generate multiple independent solutions using different reasoning paths.
+  Then evaluate each approach and select the most reliable one through self-consistency voting.
+
+approach_generation: |
+  Generate exactly 3 different approaches to solve the SQL problem:
+  
+  Approach 1: Direct/Straightforward - Use the most obvious SQL pattern
+  Approach 2: Optimized/Efficient - Focus on performance and query optimization  
+  Approach 3: Comprehensive/Detailed - Include additional context and validation
+
+voting_criteria:
+  - correctness: "Does the SQL syntax and logic appear correct?"
+  - completeness: "Does it fully answer the original question?"
+  - efficiency: "Is the query reasonably optimized?"
+  - readability: "Is the SQL clear and maintainable?"
+  - business_logic: "Does it make sense from a business perspective?"
+
+confidence_scoring: |
+  Rate each approach on a scale of 0.0 to 1.0 based on:
+  - Syntax correctness (0.3 weight)
+  - Logic soundness (0.3 weight)  
+  - Query efficiency (0.2 weight)
+  - Business relevance (0.2 weight)
+
+output_format: |
+  {
+    "approaches": [
+      {
+        "approach_type": "direct|optimized|comprehensive",
+        "reasoning": "Detailed explanation of this approach",
+        "sql": "SELECT ...",
+        "confidence": 0.85,
+        "pros": ["advantage1", "advantage2"],
+        "cons": ["limitation1", "limitation2"]
+      }
+    ],
+    "voting_analysis": {
+      "criteria_scores": {
+        "correctness": [0.9, 0.8, 0.95],
+        "completeness": [0.8, 0.9, 0.95], 
+        "efficiency": [0.7, 0.95, 0.8],
+        "readability": [0.9, 0.8, 0.85],
+        "business_logic": [0.85, 0.9, 0.9]
+      },
+      "weighted_scores": [0.83, 0.87, 0.89]
+    },
+    "selected_approach": 2,
+    "final_sql": "SELECT ...",
+    "final_confidence": 0.89,
+    "selection_reason": "Explanation of why this approach was selected"
+  }
+
+example_voting_process: |
+  Question: "What are the top 5 product categories by revenue?"
+  
+  Approach 1 (Direct): Simple JOIN and GROUP BY
+  Approach 2 (Optimized): Use subqueries for better performance
+  Approach 3 (Comprehensive): Include additional metrics and validation
+  
+  Voting considers all criteria, weights them appropriately, and selects the approach
+  with the highest combined score while explaining the decision rationale.

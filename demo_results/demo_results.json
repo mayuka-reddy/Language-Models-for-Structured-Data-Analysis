@@ -1,0 +1,1055 @@
+{
+  "demo_info": {
+    "timestamp": "2025-10-25T15:08:22.750109",
+    "version": "1.0.0",
+    "description": "ML Model Performance Demo Results",
+    "total_questions": 8,
+    "schema_tables": 5
+  },
+  "prompting_strategies": {
+    "timestamp": "2025-10-25T15:08:22.750123",
+    "strategy_performance": {
+      "chain_of_thought": {
+        "success_rate": 1.0,
+        "avg_execution_time": 1.3977289199829102e-05,
+        "total_questions": 8
+      },
+      "few_shot": {
+        "success_rate": 1.0,
+        "avg_execution_time": 1.4841556549072266e-05,
+        "total_questions": 8
+      },
+      "self_consistency": {
+        "success_rate": 1.0,
+        "avg_execution_time": 6.109476089477539e-06,
+        "total_questions": 8
+      },
+      "least_to_most": {
+        "success_rate": 1.0,
+        "avg_execution_time": 1.004338264465332e-05,
+        "total_questions": 8
+      }
+    },
+    "question_results": {
+      "Which city has the most customers?": {
+        "chain_of_thought": {
+          "prompt_length": 2810,
+          "generated_sql": "SELECT customer_city, COUNT(*) as customer_count FROM customers GROUP BY customer_city ORDER BY customer_count DESC LIMIT 1",
+          "confidence": 0.9,
+          "execution_time": 5.221366882324219e-05,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3163,
+          "generated_sql": "SELECT customer_city, COUNT(*) as customer_count FROM customers GROUP BY customer_city ORDER BY customer_count DESC LIMIT 1",
+          "confidence": 0.85,
+          "execution_time": 2.9325485229492188e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2069,
+          "generated_sql": "SELECT customer_city, COUNT(*) as customer_count FROM customers GROUP BY customer_city ORDER BY customer_count DESC LIMIT 1",
+          "confidence": 0.88,
+          "execution_time": 1.4781951904296875e-05,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3301,
+          "generated_sql": "SELECT customer_city, COUNT(*) as customer_count FROM customers GROUP BY customer_city ORDER BY customer_count DESC LIMIT 1",
+          "confidence": 0.82,
+          "execution_time": 2.2172927856445312e-05,
+          "success": true
+        }
+      },
+      "What is the average order value by payment method?": {
+        "chain_of_thought": {
+          "prompt_length": 2826,
+          "generated_sql": "SELECT payment_type, AVG(payment_value) as avg_value FROM order_payments GROUP BY payment_type ORDER BY avg_value DESC",
+          "confidence": 0.9,
+          "execution_time": 1.0013580322265625e-05,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3100,
+          "generated_sql": "SELECT payment_type, AVG(payment_value) as avg_value FROM order_payments GROUP BY payment_type ORDER BY avg_value DESC",
+          "confidence": 0.85,
+          "execution_time": 1.7881393432617188e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2085,
+          "generated_sql": "SELECT payment_type, AVG(payment_value) as avg_value FROM order_payments GROUP BY payment_type ORDER BY avg_value DESC",
+          "confidence": 0.88,
+          "execution_time": 5.7220458984375e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3315,
+          "generated_sql": "SELECT payment_type, AVG(payment_value) as avg_value FROM order_payments GROUP BY payment_type ORDER BY avg_value DESC",
+          "confidence": 0.82,
+          "execution_time": 1.4066696166992188e-05,
+          "success": true
+        }
+      },
+      "Show the top 5 product categories by total revenue": {
+        "chain_of_thought": {
+          "prompt_length": 2826,
+          "generated_sql": "SELECT p.product_category_name, SUM(oi.price + oi.freight_value) as total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 5",
+          "confidence": 0.9,
+          "execution_time": 9.059906005859375e-06,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3100,
+          "generated_sql": "SELECT p.product_category_name, SUM(oi.price + oi.freight_value) as total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 5",
+          "confidence": 0.85,
+          "execution_time": 1.4066696166992188e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2085,
+          "generated_sql": "SELECT p.product_category_name, SUM(oi.price + oi.freight_value) as total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 5",
+          "confidence": 0.88,
+          "execution_time": 4.76837158203125e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3317,
+          "generated_sql": "SELECT p.product_category_name, SUM(oi.price + oi.freight_value) as total_revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_category_name ORDER BY total_revenue DESC LIMIT 5",
+          "confidence": 0.82,
+          "execution_time": 9.298324584960938e-06,
+          "success": true
+        }
+      },
+      "Find customers who have made more than 3 orders": {
+        "chain_of_thought": {
+          "prompt_length": 2823,
+          "generated_sql": "SELECT c.customer_id, COUNT(o.order_id) as order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id HAVING COUNT(o.order_id) > 3",
+          "confidence": 0.9,
+          "execution_time": 8.344650268554688e-06,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3176,
+          "generated_sql": "SELECT c.customer_id, COUNT(o.order_id) as order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id HAVING COUNT(o.order_id) > 3",
+          "confidence": 0.85,
+          "execution_time": 1.0967254638671875e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2082,
+          "generated_sql": "SELECT c.customer_id, COUNT(o.order_id) as order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id HAVING COUNT(o.order_id) > 3",
+          "confidence": 0.88,
+          "execution_time": 5.245208740234375e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3312,
+          "generated_sql": "SELECT c.customer_id, COUNT(o.order_id) as order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id HAVING COUNT(o.order_id) > 3",
+          "confidence": 0.82,
+          "execution_time": 5.7220458984375e-06,
+          "success": true
+        }
+      },
+      "What is the average delivery time by state?": {
+        "chain_of_thought": {
+          "prompt_length": 2819,
+          "generated_sql": "SELECT c.customer_state, AVG(DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp)) as avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY avg_delivery_days",
+          "confidence": 0.9,
+          "execution_time": 8.106231689453125e-06,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3172,
+          "generated_sql": "SELECT c.customer_state, AVG(DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp)) as avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY avg_delivery_days",
+          "confidence": 0.85,
+          "execution_time": 1.0728836059570312e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2078,
+          "generated_sql": "SELECT c.customer_state, AVG(DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp)) as avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY avg_delivery_days",
+          "confidence": 0.88,
+          "execution_time": 5.0067901611328125e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3308,
+          "generated_sql": "SELECT c.customer_state, AVG(DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp)) as avg_delivery_days FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_delivered_customer_date IS NOT NULL GROUP BY c.customer_state ORDER BY avg_delivery_days",
+          "confidence": 0.82,
+          "execution_time": 5.9604644775390625e-06,
+          "success": true
+        }
+      },
+      "Which payment method is most popular for high-value orders over $200?": {
+        "chain_of_thought": {
+          "prompt_length": 2845,
+          "generated_sql": "SELECT payment_type, COUNT(*) as usage_count FROM order_payments WHERE payment_value > 200 GROUP BY payment_type ORDER BY usage_count DESC LIMIT 1",
+          "confidence": 0.9,
+          "execution_time": 8.106231689453125e-06,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3119,
+          "generated_sql": "SELECT payment_type, COUNT(*) as usage_count FROM order_payments WHERE payment_value > 200 GROUP BY payment_type ORDER BY usage_count DESC LIMIT 1",
+          "confidence": 0.85,
+          "execution_time": 1.1920928955078125e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2104,
+          "generated_sql": "SELECT payment_type, COUNT(*) as usage_count FROM order_payments WHERE payment_value > 200 GROUP BY payment_type ORDER BY usage_count DESC LIMIT 1",
+          "confidence": 0.88,
+          "execution_time": 5.245208740234375e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3336,
+          "generated_sql": "SELECT payment_type, COUNT(*) as usage_count FROM order_payments WHERE payment_value > 200 GROUP BY payment_type ORDER BY usage_count DESC LIMIT 1",
+          "confidence": 0.82,
+          "execution_time": 8.821487426757812e-06,
+          "success": true
+        }
+      },
+      "Compare monthly order trends for 2017 vs 2018": {
+        "chain_of_thought": {
+          "prompt_length": 2821,
+          "generated_sql": "SELECT YEAR(order_purchase_timestamp) as year, MONTH(order_purchase_timestamp) as month, COUNT(*) as order_count FROM orders WHERE YEAR(order_purchase_timestamp) IN (2017, 2018) GROUP BY YEAR(order_purchase_timestamp), MONTH(order_purchase_timestamp) ORDER BY year, month",
+          "confidence": 0.9,
+          "execution_time": 8.106231689453125e-06,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3115,
+          "generated_sql": "SELECT YEAR(order_purchase_timestamp) as year, MONTH(order_purchase_timestamp) as month, COUNT(*) as order_count FROM orders WHERE YEAR(order_purchase_timestamp) IN (2017, 2018) GROUP BY YEAR(order_purchase_timestamp), MONTH(order_purchase_timestamp) ORDER BY year, month",
+          "confidence": 0.85,
+          "execution_time": 1.2874603271484375e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2080,
+          "generated_sql": "SELECT YEAR(order_purchase_timestamp) as year, MONTH(order_purchase_timestamp) as month, COUNT(*) as order_count FROM orders WHERE YEAR(order_purchase_timestamp) IN (2017, 2018) GROUP BY YEAR(order_purchase_timestamp), MONTH(order_purchase_timestamp) ORDER BY year, month",
+          "confidence": 0.88,
+          "execution_time": 4.291534423828125e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3310,
+          "generated_sql": "SELECT YEAR(order_purchase_timestamp) as year, MONTH(order_purchase_timestamp) as month, COUNT(*) as order_count FROM orders WHERE YEAR(order_purchase_timestamp) IN (2017, 2018) GROUP BY YEAR(order_purchase_timestamp), MONTH(order_purchase_timestamp) ORDER BY year, month",
+          "confidence": 0.82,
+          "execution_time": 6.198883056640625e-06,
+          "success": true
+        }
+      },
+      "Find products that have never been ordered": {
+        "chain_of_thought": {
+          "prompt_length": 2818,
+          "generated_sql": "SELECT p.product_id, p.product_category_name FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id WHERE oi.product_id IS NULL",
+          "confidence": 0.9,
+          "execution_time": 7.867813110351562e-06,
+          "success": true
+        },
+        "few_shot": {
+          "prompt_length": 3092,
+          "generated_sql": "SELECT p.product_id, p.product_category_name FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id WHERE oi.product_id IS NULL",
+          "confidence": 0.85,
+          "execution_time": 1.0967254638671875e-05,
+          "success": true
+        },
+        "self_consistency": {
+          "prompt_length": 2077,
+          "generated_sql": "SELECT p.product_id, p.product_category_name FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id WHERE oi.product_id IS NULL",
+          "confidence": 0.88,
+          "execution_time": 3.814697265625e-06,
+          "success": true
+        },
+        "least_to_most": {
+          "prompt_length": 3309,
+          "generated_sql": "SELECT p.product_id, p.product_category_name FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id WHERE oi.product_id IS NULL",
+          "confidence": 0.82,
+          "execution_time": 8.106231689453125e-06,
+          "success": true
+        }
+      }
+    },
+    "benchmark_summary": {
+      "strategy_results": {
+        "chain_of_thought": {
+          "individual_results": [
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2810,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2826,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2826,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2823,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2819,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2845,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.86,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.8,
+              "prompt_length": 2821,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "ChainOfThoughtStrategy",
+              "overall_score": 0.8350000000000001,
+              "prompt_quality": 1.0,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 2818,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            }
+          ],
+          "aggregate_metrics": {
+            "average_overall_score": 0.8381250000000001,
+            "average_prompt_quality": 1.0,
+            "average_business_relevance": 0.7999999999999999,
+            "average_complexity_handling": 0.7125,
+            "total_questions_evaluated": 8
+          }
+        },
+        "few_shot": {
+          "individual_results": [
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3163,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3100,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3100,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3176,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3172,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3119,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.725,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.5,
+              "prompt_length": 3115,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "FewShotStrategy",
+              "overall_score": 0.775,
+              "prompt_quality": 0.8,
+              "business_relevance": 0.8,
+              "complexity_handling": 0.7,
+              "prompt_length": 3092,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            }
+          ],
+          "aggregate_metrics": {
+            "average_overall_score": 0.76875,
+            "average_prompt_quality": 0.7999999999999999,
+            "average_business_relevance": 0.7999999999999999,
+            "average_complexity_handling": 0.675,
+            "total_questions_evaluated": 8
+          }
+        },
+        "self_consistency": {
+          "individual_results": [
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.49250000000000005,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.35,
+              "complexity_handling": 0.5,
+              "prompt_length": 2069,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.53,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 2085,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.53,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 2085,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.53,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 2082,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.49250000000000005,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.35,
+              "complexity_handling": 0.5,
+              "prompt_length": 2078,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.53,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 2104,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.49250000000000005,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.35,
+              "complexity_handling": 0.5,
+              "prompt_length": 2080,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "SelfConsistencyStrategy",
+              "overall_score": 0.53,
+              "prompt_quality": 0.4,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 2077,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            }
+          ],
+          "aggregate_metrics": {
+            "average_overall_score": 0.5159375,
+            "average_prompt_quality": 0.39999999999999997,
+            "average_business_relevance": 0.44375000000000003,
+            "average_complexity_handling": 0.5,
+            "total_questions_evaluated": 8
+          }
+        },
+        "least_to_most": {
+          "individual_results": [
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.5900000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 3301,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.5900000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 3315,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.6275000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.6499999999999999,
+              "complexity_handling": 0.5,
+              "prompt_length": 3317,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.5900000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 3312,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.5900000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 3308,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.5900000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 3336,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.6775000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.35,
+              "complexity_handling": 1.0,
+              "prompt_length": 3310,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            },
+            {
+              "strategy_name": "LeastToMostStrategy",
+              "overall_score": 0.5900000000000001,
+              "prompt_quality": 0.6000000000000001,
+              "business_relevance": 0.5,
+              "complexity_handling": 0.5,
+              "prompt_length": 3309,
+              "prompt_structure_score": 1.0,
+              "evaluation_timestamp": "1761429825.458876"
+            }
+          ],
+          "aggregate_metrics": {
+            "average_overall_score": 0.605625,
+            "average_prompt_quality": 0.6000000000000001,
+            "average_business_relevance": 0.5,
+            "average_complexity_handling": 0.5625,
+            "total_questions_evaluated": 8
+          }
+        }
+      },
+      "ranking": [
+        {
+          "strategy": "chain_of_thought",
+          "score": 0.8381250000000001
+        },
+        {
+          "strategy": "few_shot",
+          "score": 0.76875
+        },
+        {
+          "strategy": "least_to_most",
+          "score": 0.605625
+        },
+        {
+          "strategy": "self_consistency",
+          "score": 0.5159375
+        }
+      ],
+      "best_strategy": "chain_of_thought",
+      "evaluation_summary": {
+        "total_strategies": 4,
+        "total_questions": 8,
+        "evaluation_completed": true
+      }
+    }
+  },
+  "rag_pipeline": {
+    "timestamp": "2025-10-25T15:08:22.751821",
+    "retrieval_performance": {
+      "avg_retrieval_time": 0.019197797775268553,
+      "avg_relevance_score": 0.02222222222222222,
+      "total_schema_cards": 39,
+      "index_built": true
+    },
+    "context_examples": {
+      "Which city has the most customers?": {
+        "retrieved_context": {
+          "relevant_tables": [
+            {
+              "id": "table_customers",
+              "type": "table",
+              "name": "customers",
+              "content": "Table: customers",
+              "columns": [
+                "customer_id",
+                "customer_unique_id",
+                "customer_zip_code_prefix",
+                "customer_city",
+                "customer_state"
+              ],
+              "primary_keys": [],
+              "foreign_keys": []
+            }
+          ],
+          "relevant_columns": [
+            {
+              "id": "column_customers_customer_city",
+              "type": "column",
+              "name": "customers.customer_city",
+              "content": "Column: customers.customer_city (VARCHAR)",
+              "table": "customers",
+              "data_type": "VARCHAR",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            },
+            {
+              "id": "column_customers_customer_unique_id",
+              "type": "column",
+              "name": "customers.customer_unique_id",
+              "content": "Column: customers.customer_unique_id (VARCHAR)",
+              "table": "customers",
+              "data_type": "VARCHAR",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            }
+          ],
+          "relationships": [],
+          "retrieval_scores": [
+            {
+              "content": "Column: customers.customer_city (VARCHAR)",
+              "score": 0.24544888734817505,
+              "type": "column"
+            },
+            {
+              "content": "Table: customers",
+              "score": 0.22877159714698792,
+              "type": "table"
+            },
+            {
+              "content": "Column: customers.customer_unique_id (VARCHAR)",
+              "score": 0.15002697706222534,
+              "type": "column"
+            }
+          ]
+        },
+        "retrieval_time": 0.0340580940246582,
+        "relevance_score": 0.0,
+        "num_results": 3
+      },
+      "What is the average order value by payment method?": {
+        "retrieved_context": {
+          "relevant_tables": [
+            {
+              "id": "table_order_payments",
+              "type": "table",
+              "name": "order_payments",
+              "content": "Table: order_payments",
+              "columns": [
+                "order_id",
+                "payment_sequential",
+                "payment_type",
+                "payment_installments",
+                "payment_value"
+              ],
+              "primary_keys": [],
+              "foreign_keys": []
+            }
+          ],
+          "relevant_columns": [
+            {
+              "id": "column_order_payments_payment_installments",
+              "type": "column",
+              "name": "order_payments.payment_installments",
+              "content": "Column: order_payments.payment_installments (INTEGER)",
+              "table": "order_payments",
+              "data_type": "INTEGER",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            },
+            {
+              "id": "column_order_payments_payment_sequential",
+              "type": "column",
+              "name": "order_payments.payment_sequential",
+              "content": "Column: order_payments.payment_sequential (INTEGER)",
+              "table": "order_payments",
+              "data_type": "INTEGER",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            }
+          ],
+          "relationships": [],
+          "retrieval_scores": [
+            {
+              "content": "Table: order_payments",
+              "score": 0.28398773074150085,
+              "type": "table"
+            },
+            {
+              "content": "Column: order_payments.payment_installments (INTEGER)",
+              "score": 0.2661673426628113,
+              "type": "column"
+            },
+            {
+              "content": "Column: order_payments.payment_sequential (INTEGER)",
+              "score": 0.26544445753097534,
+              "type": "column"
+            }
+          ]
+        },
+        "retrieval_time": 0.020940065383911133,
+        "relevance_score": 0.0,
+        "num_results": 3
+      },
+      "Show the top 5 product categories by total revenue": {
+        "retrieved_context": {
+          "relevant_tables": [
+            {
+              "id": "table_products",
+              "type": "table",
+              "name": "products",
+              "content": "Table: products",
+              "columns": [
+                "product_id",
+                "product_category_name",
+                "product_name_length",
+                "product_description_length",
+                "product_photos_qty",
+                "product_weight_g",
+                "product_length_cm",
+                "product_height_cm",
+                "product_width_cm"
+              ],
+              "primary_keys": [],
+              "foreign_keys": []
+            }
+          ],
+          "relevant_columns": [
+            {
+              "id": "column_products_product_category_name",
+              "type": "column",
+              "name": "products.product_category_name",
+              "content": "Column: products.product_category_name (VARCHAR)",
+              "table": "products",
+              "data_type": "VARCHAR",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            },
+            {
+              "id": "column_products_product_weight_g",
+              "type": "column",
+              "name": "products.product_weight_g",
+              "content": "Column: products.product_weight_g (INTEGER)",
+              "table": "products",
+              "data_type": "INTEGER",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            }
+          ],
+          "relationships": [],
+          "retrieval_scores": [
+            {
+              "content": "Table: products",
+              "score": 0.21966023743152618,
+              "type": "table"
+            },
+            {
+              "content": "Column: products.product_category_name (VARCHAR)",
+              "score": 0.1902230679988861,
+              "type": "column"
+            },
+            {
+              "content": "Column: products.product_weight_g (INTEGER)",
+              "score": 0.1405421495437622,
+              "type": "column"
+            }
+          ]
+        },
+        "retrieval_time": 0.023589134216308594,
+        "relevance_score": 0.0,
+        "num_results": 3
+      },
+      "Find customers who have made more than 3 orders": {
+        "retrieved_context": {
+          "relevant_tables": [
+            {
+              "id": "table_customers",
+              "type": "table",
+              "name": "customers",
+              "content": "Table: customers",
+              "columns": [
+                "customer_id",
+                "customer_unique_id",
+                "customer_zip_code_prefix",
+                "customer_city",
+                "customer_state"
+              ],
+              "primary_keys": [],
+              "foreign_keys": []
+            },
+            {
+              "id": "table_orders",
+              "type": "table",
+              "name": "orders",
+              "content": "Table: orders",
+              "columns": [
+                "order_id",
+                "customer_id",
+                "order_status",
+                "order_purchase_timestamp",
+                "order_approved_at",
+                "order_delivered_carrier_date",
+                "order_delivered_customer_date",
+                "order_estimated_delivery_date"
+              ],
+              "primary_keys": [],
+              "foreign_keys": []
+            }
+          ],
+          "relevant_columns": [
+            {
+              "id": "column_orders_customer_id",
+              "type": "column",
+              "name": "orders.customer_id",
+              "content": "Column: orders.customer_id (VARCHAR)",
+              "table": "orders",
+              "data_type": "VARCHAR",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": true
+            }
+          ],
+          "relationships": [],
+          "retrieval_scores": [
+            {
+              "content": "Table: customers",
+              "score": 0.26012247800827026,
+              "type": "table"
+            },
+            {
+              "content": "Table: orders",
+              "score": 0.24654480814933777,
+              "type": "table"
+            },
+            {
+              "content": "Column: orders.customer_id (VARCHAR)",
+              "score": 0.2152562141418457,
+              "type": "column"
+            }
+          ]
+        },
+        "retrieval_time": 0.008911848068237305,
+        "relevance_score": 0.1111111111111111,
+        "num_results": 3
+      },
+      "What is the average delivery time by state?": {
+        "retrieved_context": {
+          "relevant_tables": [],
+          "relevant_columns": [
+            {
+              "id": "column_orders_order_estimated_delivery_date",
+              "type": "column",
+              "name": "orders.order_estimated_delivery_date",
+              "content": "Column: orders.order_estimated_delivery_date (DATETIME)",
+              "table": "orders",
+              "data_type": "DATETIME",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            },
+            {
+              "id": "column_orders_order_delivered_carrier_date",
+              "type": "column",
+              "name": "orders.order_delivered_carrier_date",
+              "content": "Column: orders.order_delivered_carrier_date (DATETIME)",
+              "table": "orders",
+              "data_type": "DATETIME",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            },
+            {
+              "id": "column_orders_order_delivered_customer_date",
+              "type": "column",
+              "name": "orders.order_delivered_customer_date",
+              "content": "Column: orders.order_delivered_customer_date (DATETIME)",
+              "table": "orders",
+              "data_type": "DATETIME",
+              "nullable": true,
+              "is_primary_key": false,
+              "is_foreign_key": false
+            }
+          ],
+          "relationships": [],
+          "retrieval_scores": [
+            {
+              "content": "Column: orders.order_estimated_delivery_date (DATETIME)",
+              "score": 0.21226570010185242,
+              "type": "column"
+            },
+            {
+              "content": "Column: orders.order_delivered_carrier_date (DATETIME)",
+              "score": 0.1925312578678131,
+              "type": "column"
+            },
+            {
+              "content": "Column: orders.order_delivered_customer_date (DATETIME)",
+              "score": 0.192373588681221,
+              "type": "column"
+            }
+          ]
+        },
+        "retrieval_time": 0.008489847183227539,
+        "relevance_score": 0.0,
+        "num_results": 3
+      }
+    },
+    "quality_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.0
+    }
+  },
+  "metrics_calculation": {
+    "timestamp": "2025-10-25T15:08:22.934004",
+    "sample_metrics": {
+      "pair_1": {
+        "question": "Which city has the most customers?",
+        "bleu_score": 0.619689200200034,
+        "execution_correct": true,
+        "schema_compliant": false,
+        "predicted_sql": "SELECT customer_city, COUNT(*) as customer_count FROM customers GROUP BY customer_city ORDER BY customer_count DESC LIMIT 1",
+        "reference_sql": "SELECT customer_city, COUNT(*) FROM customers GROUP BY customer_city ORDER BY COUNT(*) DESC LIMIT 1"
+      },
+      "pair_2": {
+        "question": "What is the average order value by payment method?",
+        "bleu_score": 0.5061208977839848,
+        "execution_correct": true,
+        "schema_compliant": false,
+        "predicted_sql": "SELECT payment_type, AVG(payment_value) FROM order_payments GROUP BY payment_type",
+        "reference_sql": "SELECT payment_type, AVG(payment_value) as avg_value FROM order_payments GROUP BY payment_type ORDER BY avg_value DESC"
+      }
+    },
+    "performance_data": {
+      "average_bleu_score": 0.5629050489920094,
+      "execution_accuracy": 1.0,
+      "schema_compliance_rate": 0.0,
+      "total_samples": 2
+    }
+  },
+  "summary": {
+    "best_strategy": "chain_of_thought",
+    "avg_retrieval_time": 0.019197797775268553,
+    "avg_bleu_score": 0.5629050489920094,
+    "execution_accuracy": 1.0,
+    "demo_completed": true
+  }
+}

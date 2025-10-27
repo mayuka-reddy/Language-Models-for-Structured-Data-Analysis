@@ -1,0 +1,199 @@
+{
+  "system_info": {
+    "platform": "macOS-26.0.1-arm64-arm-64bit",
+    "system": "Darwin",
+    "machine": "arm64",
+    "processor": "arm",
+    "python_implementation": "CPython",
+    "architecture": "64bit"
+  },
+  "python_version": {
+    "current_version": "3.9.6",
+    "minimum_required": "3.8",
+    "recommended": "3.9",
+    "is_compatible": true,
+    "is_recommended": true,
+    "status": "pass"
+  },
+  "required_packages": {
+    "packages": {
+      "torch": {
+        "available": true,
+        "version": "2.8.0",
+        "min_version": "1.9.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "transformers": {
+        "available": true,
+        "version": "4.56.2",
+        "min_version": "4.20.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "datasets": {
+        "available": true,
+        "version": "4.1.1",
+        "min_version": "2.0.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "pandas": {
+        "available": true,
+        "version": "2.3.2",
+        "min_version": "1.3.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "numpy": {
+        "available": true,
+        "version": "2.0.2",
+        "min_version": "1.21.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "matplotlib": {
+        "available": true,
+        "version": "3.9.4",
+        "min_version": "3.5.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "seaborn": {
+        "available": true,
+        "version": "0.13.2",
+        "min_version": "0.11.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "sqlparse": {
+        "available": true,
+        "version": "0.5.3",
+        "min_version": "0.4.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "yaml": {
+        "available": true,
+        "version": "6.0.3",
+        "min_version": "6.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "tqdm": {
+        "available": true,
+        "version": "4.67.1",
+        "min_version": "4.60.0",
+        "version_compatible": true,
+        "status": "pass"
+      }
+    },
+    "all_available": true,
+    "status": "pass"
+  },
+  "optional_packages": {
+    "packages": {
+      "sentence-transformers": {
+        "available": false,
+        "version": null,
+        "min_version": "2.2.0",
+        "version_compatible": false,
+        "status": "missing"
+      },
+      "faiss-cpu": {
+        "available": false,
+        "version": null,
+        "min_version": "1.7.0",
+        "version_compatible": false,
+        "status": "missing"
+      },
+      "rank-bm25": {
+        "available": false,
+        "version": null,
+        "min_version": "0.2.0",
+        "version_compatible": false,
+        "status": "missing"
+      },
+      "wandb": {
+        "available": false,
+        "version": null,
+        "min_version": "0.12.0",
+        "version_compatible": false,
+        "status": "missing"
+      },
+      "plotly": {
+        "available": true,
+        "version": "6.3.0",
+        "min_version": "5.0.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "loguru": {
+        "available": true,
+        "version": "0.7.3",
+        "min_version": "0.6.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "nltk": {
+        "available": true,
+        "version": "3.9.1",
+        "min_version": "3.7",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "scikit-learn": {
+        "available": false,
+        "version": null,
+        "min_version": "1.0.0",
+        "version_compatible": false,
+        "status": "missing"
+      },
+      "jupyter": {
+        "available": true,
+        "version": "unknown",
+        "min_version": "1.0.0",
+        "version_compatible": true,
+        "status": "pass"
+      },
+      "ipywidgets": {
+        "available": true,
+        "version": "8.1.7",
+        "min_version": "7.6.0",
+        "version_compatible": true,
+        "status": "pass"
+      }
+    },
+    "available_count": 5,
+    "total_count": 10,
+    "coverage": 0.5,
+    "status": "partial"
+  },
+  "gpu_availability": {
+    "cuda_available": false,
+    "cuda_version": null,
+    "gpu_count": 0,
+    "gpu_names": [],
+    "gpu_memory": [],
+    "status": "cpu_only"
+  },
+  "memory_info": {
+    "total_ram_gb": 16.0,
+    "available_ram_gb": 4.77,
+    "status": "adequate"
+  },
+  "model_loading": {
+    "transformers_loading": true,
+    "tokenizer_loading": true,
+    "model_inference": true,
+    "error_messages": [],
+    "status": "pass"
+  },
+  "data_access": {
+    "data_dir_exists": true,
+    "sample_db_exists": true,
+    "writable": true,
+    "status": "pass"
+  },
+  "overall_status": "basic"
+}

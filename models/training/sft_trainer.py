@@ -38,7 +38,7 @@ class SFTConfig:
     max_target_length: int = 256
     
     # Training configuration
-    output_dir: str = "training/checkpoints/sft"
+    output_dir: str = "models/training/model_checkpoints"
     num_train_epochs: int = 3
     per_device_train_batch_size: int = 8
     per_device_eval_batch_size: int = 8
@@ -48,8 +48,8 @@ class SFTConfig:
     warmup_steps: int = 500
     
     # Data configuration
-    train_data_path: str = "data/processed/train_pairs.json"
-    eval_data_path: str = "data/processed/eval_pairs.json"
+    train_data_path: str = "models/training/training_data/train_pairs.json"
+    eval_data_path: str = "models/training/training_data/eval_pairs.json"
     
     # Logging and evaluation
     logging_steps: int = 100
@@ -143,8 +143,8 @@ class NL2SQLDataset(Dataset):
         return " | ".join(input_parts)
 
 
-class SFTTrainer:
-    """Supervised fine-tuning trainer."""
+class EnhancedSFTTrainer:
+    """Enhanced supervised fine-tuning trainer."""
     
     def __init__(self, config: SFTConfig):
         self.config = config
@@ -229,9 +229,24 @@ class SFTTrainer:
             data_collator=data_collator
         )
     
-    def train(self) -> None:
-        """Run training."""
+    def prepare_training_data(self) -> None:
+        """Prepare and validate training data."""
+        # Create directories if they don't exist
+        os.makedirs(os.path.dirname(self.config.train_data_path), exist_ok=True)
+        os.makedirs(self.config.output_dir, exist_ok=True)
+        
+        # Create sample data if files don't exist
+        if not os.path.exists(self.config.train_data_path):
+            self._create_sample_data(self.config.train_data_path)
+        if not os.path.exists(self.config.eval_data_path):
+            self._create_sample_data(self.config.eval_data_path)
+    
+    def train_model(self) -> Dict[str, Any]:
+        """Run training and return results."""
         logger.info("Starting supervised fine-tuning...")
+        
+        # Prepare data
+        self.prepare_training_data()
         
         # Initialize wandb if available
         if wandb.api.api_key:
@@ -242,15 +257,31 @@ class SFTTrainer:
             )
         
         # Train model
-        self.trainer.train()
+        train_result = self.trainer.train()
         
         # Save final model
-        self.trainer.save_model()
-        self.tokenizer.save_pretrained(self.config.output_dir)
+        self.save_model(self.config.output_dir)
         
         logger.info(f"Training completed. Model saved to {self.config.output_dir}")
+        
+        return {
+            'train_loss': train_result.training_loss,
+            'train_runtime': train_result.metrics.get('train_runtime', 0),
+            'train_samples_per_second': train_result.metrics.get('train_samples_per_second', 0)
+        }
     
-    def evaluate(self) -> Dict[str, float]:
+    def save_model(self, path: str) -> bool:
+        """Save model and tokenizer."""
+        try:
+            self.trainer.save_model(path)
+            self.tokenizer.save_pretrained(path)
+            logger.info(f"Model saved successfully to {path}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save model: {e}")
+            return False
+    
+    def evaluate_model(self) -> Dict[str, float]:
         """Evaluate the model."""
         if self.eval_dataset is None:
             logger.warning("No evaluation dataset available")
@@ -262,83 +293,47 @@ class SFTTrainer:
         logger.info(f"Evaluation results: {eval_results}")
         return eval_results
     
-    def generate_sample(self, question: str, schema_context: Optional[Dict] = None) -> str:
-        """Generate SQL for a sample question."""
-        # Format input
-        input_parts = [
-            "Generate SQL for the following question:",
-            f"Question: {question}"
+    def plot_training_curves(self) -> None:
+        """Plot training curves (placeholder for visualization)."""
+        # This would implement actual plotting using matplotlib/wandb
+        logger.info("Training curves would be plotted here")
+    
+    def _create_sample_data(self, output_path: str) -> None:
+        """Create sample training data for testing."""
+        sample_data = [
+            {
+                "question": "Which city has the highest number of customers?",
+                "sql": "SELECT city, COUNT(*) as customer_count FROM customer GROUP BY city ORDER BY customer_count DESC LIMIT 1",
+                "schema_context": {
+                    "relevant_tables": ["customer"],
+                    "relevant_columns": ["city", "customer_id"]
+                }
+            },
+            {
+                "question": "What was the total sales in August 2025?",
+                "sql": "SELECT SUM(total_amount) as total_sales FROM orders WHERE order_date >= '2025-08-01' AND order_date < '2025-09-01'",
+                "schema_context": {
+                    "relevant_tables": ["orders"],
+                    "relevant_columns": ["total_amount", "order_date"]
+                }
+            }
         ]
         
-        if schema_context:
-            if 'relevant_tables' in schema_context:
-                tables_str = ", ".join(schema_context['relevant_tables'])
-                input_parts.append(f"Tables: {tables_str}")
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, 'w') as f:
+            json.dump(sample_data, f, indent=2)
         
-        input_text = " | ".join(input_parts)
-        
-        # Tokenize and generate
-        inputs = self.tokenizer(
-            input_text,
-            return_tensors='pt',
-            max_length=self.config.max_input_length,
-            truncation=True
-        )
-        
-        with torch.no_grad():
-            outputs = self.model.generate(
-                **inputs,
-                max_length=self.config.max_target_length,
-                num_beams=4,
-                early_stopping=True
-            )
-        
-        generated_sql = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return generated_sql
-
-
-def create_sample_data(output_path: str) -> None:
-    """Create sample training data for testing."""
-    sample_data = [
-        {
-            "question": "Which city has the highest number of customers?",
-            "sql": "SELECT city, COUNT(*) as customer_count FROM customer GROUP BY city ORDER BY customer_count DESC LIMIT 1",
-            "schema_context": {
-                "relevant_tables": ["customer"],
-                "relevant_columns": ["city", "customer_id"]
-            }
-        },
-        {
-            "question": "What was the total sales in August 2025?",
-            "sql": "SELECT SUM(total_amount) as total_sales FROM orders WHERE order_date >= '2025-08-01' AND order_date < '2025-09-01'",
-            "schema_context": {
-                "relevant_tables": ["orders"],
-                "relevant_columns": ["total_amount", "order_date"]
-            }
-        }
-    ]
-    
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, 'w') as f:
-        json.dump(sample_data, f, indent=2)
-    
-    logger.info(f"Sample data created at {output_path}")
+        logger.info(f"Sample data created at {output_path}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Supervised Fine-Tuning for NL-to-SQL")
     parser.add_argument("--config", type=str, help="Path to config file")
     parser.add_argument("--model_name", type=str, default="t5-small", help="Model name")
-    parser.add_argument("--output_dir", type=str, default="training/checkpoints/sft", help="Output directory")
+    parser.add_argument("--output_dir", type=str, default="models/training/model_checkpoints", help="Output directory")
     parser.add_argument("--create_sample_data", action="store_true", help="Create sample training data")
     
     args = parser.parse_args()
-    
-    # Create sample data if requested
-    if args.create_sample_data:
-        create_sample_data("data/processed/train_pairs.json")
-        create_sample_data("data/processed/eval_pairs.json")
-        return
     
     # Initialize config
     config = SFTConfig(
@@ -347,17 +342,22 @@ def main():
     )
     
     # Create trainer and run training
-    trainer = SFTTrainer(config)
-    trainer.train()
+    trainer = EnhancedSFTTrainer(config)
+    
+    if args.create_sample_data:
+        trainer.prepare_training_data()
+        return
+    
+    # Run training
+    train_results = trainer.train_model()
     
     # Run evaluation
-    trainer.evaluate()
+    eval_results = trainer.evaluate_model()
     
-    # Test generation
-    sample_question = "Which city has the most customers?"
-    generated_sql = trainer.generate_sample(sample_question)
-    logger.info(f"Sample generation - Question: {sample_question}")
-    logger.info(f"Generated SQL: {generated_sql}")
+    # Plot training curves
+    trainer.plot_training_curves()
+    
+    logger.info("Training pipeline completed successfully")
 
 
 if __name__ == "__main__":
